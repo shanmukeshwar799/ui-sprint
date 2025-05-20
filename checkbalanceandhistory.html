@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Bank - Account Balance</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #003366;
+      --secondary-color: #0056b3;
+      --accent-color: #ffcc00;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --success-color: #28a745;
+      --error-color: #dc3545;
+      --form-bg: rgba(255, 255, 255, 0.9);
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: var(--dark-color);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, rgba(0, 51, 102, 0.9), rgba(0, 86, 179, 0.9)), 
+                  url('https://images.unsplash.com/photo-1601597111158-2fceff292cdc?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover;
+    }
+    
+    /* Header Styles */
+    header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      padding: 1rem 2rem;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 1000;
+    }
+    
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    
+    .logo h1 {
+      font-size: 1.8rem;
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    
+    .logo span {
+      color: var(--accent-color);
+    }
+    
+    nav ul {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    
+    nav li {
+      margin-left: 1.5rem;
+      position: relative;
+    }
+    
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1rem;
+      padding: 0.5rem 0;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    nav a:after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: var(--accent-color);
+      transition: width 0.3s ease;
+    }
+    
+    nav a:hover:after {
+      width: 100%;
+    }
+    
+    nav a:hover {
+      color: var(--accent-color);
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-right: auto;
+      margin-left: 2rem;
+      color: rgb(250, 250, 252);
+      font-weight: 500;
+    }
+    
+    /* Main Content Styles */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    
+    .balance-container {
+      background: var(--form-bg);
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 800px;
+      padding: 2.5rem;
+      margin: 2rem 0;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .balance-container h2 {
+      color: var(--primary-color);
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+      position: relative;
+      padding-bottom: 10px;
+    }
+    
+    .balance-container h2:after {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 3px;
+      background: var(--accent-color);
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    
+    /* Balance Summary */
+    .balance-summary {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding: 2rem;
+      background: rgba(0, 86, 179, 0.05);
+      border-radius: 10px;
+      border: 1px dashed rgba(0, 86, 179, 0.3);
+    }
+    
+    .total-balance {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin: 1rem 0;
+    }
+    
+    .balance-label {
+      font-size: 1rem;
+      color: var(--primary-color);
+      opacity: 0.8;
+    }
+    
+    .account-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    
+    .account-card {
+      background: white;
+      border-radius: 10px;
+      padding: 1.5rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    
+    .account-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .account-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .account-type {
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
+    .account-number {
+      font-family: monospace;
+      color: var(--secondary-color);
+    }
+    
+    .account-balance {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 1rem 0;
+      text-align: center;
+    }
+    
+    .account-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    
+    .account-detail {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .detail-label {
+      font-size: 0.8rem;
+      color: var(--primary-color);
+      opacity: 0.7;
+    }
+    
+    .detail-value {
+      font-weight: 600;
+      margin-top: 0.3rem;
+    }
+    
+    .currency {
+      font-size: 0.8em;
+      vertical-align: super;
+    }
+    
+    /* Footer Styles */
+    footer {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+    
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .footer-bottom {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .header-container {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .user-info {
+        margin: 1rem 0;
+      }
+      
+      nav ul {
+        margin-top: 1rem;
+      }
+      
+      nav li {
+        margin: 0 0.5rem;
+      }
+      
+      .balance-container {
+        padding: 1.5rem;
+      }
+      
+      .account-cards {
+        grid-template-columns: 1fr;
+      }
+      
+      body {
+        background-attachment: fixed;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo" onclick="location.href='index.html'">
+        <h1>World<span>Bank</span></h1>
+      </div>
+      <div class="user-info" id="userInfo">
+        <i class="fas fa-user-circle"></i>
+        <span id="userName"></span> | <span id="userId"></span>
+      </div>
+      <nav>
+        <ul class="user-nav" id="userNav">
+          <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+  <main>
+    <div class="balance-container">
+      <h2>Account Balance</h2>
+      
+      <div class="balance-summary">
+        <span class="balance-label">Total Available Balance</span>
+        <div class="total-balance">₹<span id="totalBalance">0.00</span></div>
+        <span class="balance-label">Across all accounts</span>
+      </div>
+      
+      <div class="account-cards" id="accountCards">
+        <!-- Account cards will be dynamically inserted here -->
+      </div>
+    </div>
+  </main>
+  
+  <footer>
+    <div class="footer-container">
+      <div class="footer-bottom">
+        <p>&copy; 2025 World Bank. All rights reserved. | Phone: (123) 456-7890</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Check if user is logged in
+      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      const currentUser = JSON.parse(localStorage.getItem('loggedInCustomer') || JSON.parse(localStorage.getItem('currentCustomer') || '{}'));
+      
+      if (!isLoggedIn || !currentUser.firstName) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Display user info in header
+      const userInfo = document.getElementById('userInfo');
+      const userName = document.getElementById('userName');
+      const userId = document.getElementById('userId');
+      
+      userName.textContent = `${currentUser.firstName} ${currentUser.lastName}`;
+      userId.textContent = currentUser.empId ? `EMP ID: ${currentUser.empId}` : `CUST ID: ${currentUser.customerId}`;
+      
+      // Logout functionality
+      document.getElementById('logoutBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('loggedInEmployee');
+        localStorage.removeItem('currentCustomer');
+        window.location.href = 'login.html';
+      });
+      
+      // Get customer accounts from localStorage
+      let accounts = JSON.parse(localStorage.getItem('customerAccounts') || '[]');
+      
+      // Calculate total balance
+      const totalBalance = accounts.reduce((sum, account) => sum + account.accountBalance, 0);
+      document.getElementById('totalBalance').textContent = totalBalance.toFixed(2);
+      
+      // Display account cards
+      const accountCardsContainer = document.getElementById('accountCards');
+      
+      if (accounts.length === 0) {
+        accountCardsContainer.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">
+            <i class="fas fa-wallet" style="font-size: 3rem; color: var(--secondary-color); opacity: 0.5; margin-bottom: 1rem;"></i>
+            <p style="color: var(--primary-color);">No accounts found</p>
+          </div>
+        `;
+      } else {
+        accounts.forEach(account => {
+          const accountCard = document.createElement('div');
+          accountCard.className = 'account-card';
+          accountCard.innerHTML = `
+            <div class="account-card-header">
+              <span class="account-type">${account.accountType || 'Savings Account'}</span>
+              <span class="account-number">•••• ${account.accountNumber.slice(-4)}</span>
+            </div>
+            <div class="account-balance">₹${account.accountBalance.toFixed(2)}</div>
+            <div class="account-details">
+              <div class="account-detail">
+                <span class="detail-label">Account Holder</span>
+                <span class="detail-value">${account.customerName}</span>
+              </div>
+              <div class="account-detail">
+                <span class="detail-label">IFSC Code</span>
+                <span class="detail-value">${account.ifscCode}</span>
+              </div>
+              <div class="account-detail">
+                <span class="detail-label">Status</span>
+                <span class="detail-value" style="color: var(--success-color);">Active</span>
+              </div>
+              <div class="account-detail">
+                <span class="detail-label">Last Transaction</span>
+                <span class="detail-value">
+                  ${account.transactions && account.transactions.length > 0 ? 
+                    new Date(account.transactions[account.transactions.length - 1].date).toLocaleDateString() : 
+                    'N/A'}
+                </span>
+              </div>
+            </div>
+          `;
+          accountCardsContainer.appendChild(accountCard);
+        });
+      }
+    });
+  </script>
+</body>
+</html>

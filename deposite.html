@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>World Bank - Deposit Amount</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #003366;
+      --secondary-color: #0056b3;
+      --accent-color: #ffcc00;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --success-color: #28a745;
+      --error-color: #dc3545;
+      --form-bg: rgba(255, 255, 255, 0.9);
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: var(--dark-color);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, rgba(0, 51, 102, 0.9), rgba(0, 86, 179, 0.9)), 
+                  url('https://images.unsplash.com/photo-1601597111158-2fceff292cdc?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover;
+    }
+    
+    /* Header Styles */
+    header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      padding: 1rem 2rem;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 1000;
+    }
+    
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    
+    .logo h1 {
+      font-size: 1.8rem;
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    
+    .logo span {
+      color: var(--accent-color);
+    }
+    
+    nav ul {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    
+    nav li {
+      margin-left: 1.5rem;
+      position: relative;
+    }
+    
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1rem;
+      padding: 0.5rem 0;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    nav a:after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: var(--accent-color);
+      transition: width 0.3s ease;
+    }
+    
+    nav a:hover:after {
+      width: 100%;
+    }
+    
+    nav a:hover {
+      color: var(--accent-color);
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-right: auto;
+      margin-left: 2rem;
+      color: rgb(250, 250, 252);
+      font-weight: 500;
+    }
+    
+    /* Main Content Styles */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    
+    .deposit-container {
+      background: var(--form-bg);
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 500px;
+      padding: 2.5rem;
+      margin: 2rem 0;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .deposit-container h2 {
+      color: var(--primary-color);
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+      position: relative;
+      padding-bottom: 10px;
+    }
+    
+    .deposit-container h2:after {
+      content: '';
+      position: absolute;
+      width: 60px;
+      height: 3px;
+      background: var(--accent-color);
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.3);
+      background-color: white;
+    }
+    
+    .account-info {
+      background: rgba(0, 86, 179, 0.1);
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid var(--secondary-color);
+    }
+    
+    .account-info p {
+      margin: 0;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
+    /* Button Styles */
+    .btn {
+      display: inline-block;
+      padding: 0.8rem 2rem;
+      background: linear-gradient(135deg, var(--accent-color), #ffdb58);
+      color: var(--primary-color);
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 1rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    
+    .btn:hover {
+      background: linear-gradient(135deg, #ffdb58, var(--accent-color));
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn:active {
+      transform: translateY(1px);
+    }
+    
+    /* Message Styles */
+    .message {
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+    
+    .error-message {
+      background-color: rgba(220, 53, 69, 0.1);
+      border-left: 4px solid var(--error-color);
+      color: var(--error-color);
+    }
+    
+    .success-message {
+      background-color: rgba(40, 167, 69, 0.1);
+      border-left: 4px solid var(--success-color);
+      color: var(--success-color);
+    }
+    
+    .account-details {
+      background: var(--form-bg);
+      border-radius: 6px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .account-details h3 {
+      color: var(--primary-color);
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+    
+    .account-details p {
+      margin: 0.5rem 0;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .account-details span:first-child {
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
+    /* Footer Styles */
+    footer {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 1.5rem 2rem;
+      text-align: center;
+    }
+    
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .footer-bottom {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .header-container {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .user-info {
+        margin: 1rem 0;
+      }
+      
+      nav ul {
+        margin-top: 1rem;
+      }
+      
+      nav li {
+        margin: 0 0.5rem;
+      }
+      
+      .deposit-container {
+        padding: 1.5rem;
+      }
+      
+      body {
+        background-attachment: fixed;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo" onclick="location.href='index.html'">
+        <h1>World<span>Bank</span></h1>
+      </div>
+      <div class="user-info" id="userInfo">
+        <i class="fas fa-user-circle"></i>
+        <span id="userName"></span> | <span id="userId"></span>
+      </div>
+      <nav>
+        <ul class="user-nav" id="userNav">
+          <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+  <main>
+    <div class="deposit-container">
+      <h2>Deposit Amount</h2>
+      
+      <div class="account-info">
+        <p>Account Number: <span id="accountNumber"></span></p>
+        <p>Current Balance: ₹<span id="currentBalance">0.00</span></p>
+      </div>
+      
+      <div class="message error-message" id="errorMessage">
+        Please enter a valid deposit amount
+      </div>
+      
+      <div class="message success-message" id="successMessage">
+        Deposit successful! Your new balance is ₹<span id="newBalance"></span>
+      </div>
+      
+      <form id="depositForm">
+        <div class="form-group">
+          <label for="depositAmount">Deposit Amount (₹)</label>
+          <input type="number" id="depositAmount" min="1" step="1" required>
+        </div>
+        
+        <button type="submit" class="btn">Deposit Amount</button>
+      </form>
+      
+      <div class="account-details hidden" id="accountDetails">
+        <h3>Account Details</h3>
+        <p>
+          <span>Account Holder:</span>
+          <span id="detailName"></span>
+        </p>
+        <p>
+          <span>Account Number:</span>
+          <span id="detailAccountNumber"></span>
+        </p>
+        <p>
+          <span>Current Balance:</span>
+          <span id="detailBalance"></span>
+        </p>
+        <p>
+          <span>Last Transaction:</span>
+          <span id="detailTransaction"></span>
+        </p>
+      </div>
+    </div>
+  </main>
+  
+  <footer>
+    <div class="footer-container">
+      <div class="footer-bottom">
+        <p>&copy; 2025 World Bank. All rights reserved. | Phone: (123) 456-7890</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Check if user is logged in
+      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      const currentUser = JSON.parse(localStorage.getItem('loggedInCustomer') || JSON.parse(localStorage.getItem('currentCustomer') || '{}'));
+      
+      if (!isLoggedIn || !currentUser.firstName) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Display user info in header
+      const userInfo = document.getElementById('userInfo');
+      const userName = document.getElementById('userName');
+      const userId = document.getElementById('userId');
+      
+      userName.textContent = `${currentUser.firstName} ${currentUser.lastName}`;
+      userId.textContent = currentUser.empId ? `EMP ID: ${currentUser.empId}` : `CUST ID: ${currentUser.customerId}`;
+      
+      // Logout functionality
+      document.getElementById('logoutBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('loggedInEmployee');
+        localStorage.removeItem('currentCustomer');
+        window.location.href = 'login.html';
+      });
+      
+      // Get customer accounts from localStorage
+      let accounts = JSON.parse(localStorage.getItem('customerAccounts') || '[]');
+      
+      // For demo purposes, use the first account if available
+      let currentAccount = accounts.length > 0 ? accounts[0] : null;
+      
+      // Display account info
+      const accountNumberElement = document.getElementById('accountNumber');
+      const currentBalanceElement = document.getElementById('currentBalance');
+      
+      if (currentAccount) {
+        accountNumberElement.textContent = currentAccount.accountNumber;
+        currentBalanceElement.textContent = currentAccount.accountBalance.toFixed(2);
+      } else {
+        accountNumberElement.textContent = "Not available";
+        currentBalanceElement.textContent = "0.00";
+      }
+      
+      // Deposit form submission
+      const depositForm = document.getElementById('depositForm');
+      const errorMessage = document.getElementById('errorMessage');
+      const successMessage = document.getElementById('successMessage');
+      const newBalanceElement = document.getElementById('newBalance');
+      const accountDetails = document.getElementById('accountDetails');
+      
+      depositForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Hide messages
+        errorMessage.style.display = 'none';
+        successMessage.style.display = 'none';
+        
+        // Get deposit amount
+        const depositAmount = parseFloat(document.getElementById('depositAmount').value);
+        const currentBalance = currentAccount ? parseFloat(currentAccount.accountBalance) : 0;
+        
+        // Validate deposit
+        if (isNaN(depositAmount)) {
+          errorMessage.textContent = "Please enter a valid amount";
+          errorMessage.style.display = 'block';
+          return;
+        }
+        
+        if (depositAmount <= 0) {
+          errorMessage.textContent = "Deposit amount must be greater than 0";
+          errorMessage.style.display = 'block';
+          return;
+        }
+        
+        // Process deposit
+        const newBalance = currentBalance + depositAmount;
+        
+        // Update account balance
+        if (currentAccount) {
+          currentAccount.accountBalance = newBalance;
+          
+          // Add transaction record
+          if (!currentAccount.transactions) {
+            currentAccount.transactions = [];
+          }
+          
+          currentAccount.transactions.push({
+            type: "deposit",
+            amount: depositAmount,
+            date: new Date().toISOString(),
+            balanceAfter: newBalance
+          });
+          
+          // Update in localStorage
+          const accountIndex = accounts.findIndex(acc => acc.accountNumber === currentAccount.accountNumber);
+          if (accountIndex !== -1) {
+            accounts[accountIndex] = currentAccount;
+            localStorage.setItem('customerAccounts', JSON.stringify(accounts));
+          }
+        }
+        
+        // Show success message
+        newBalanceElement.textContent = newBalance.toFixed(2);
+        successMessage.style.display = 'block';
+        
+        // Update displayed balance
+        currentBalanceElement.textContent = newBalance.toFixed(2);
+        
+        // Show account details
+        if (currentAccount) {
+          document.getElementById('detailName').textContent = currentAccount.customerName;
+          document.getElementById('detailAccountNumber').textContent = currentAccount.accountNumber;
+          document.getElementById('detailBalance').textContent = `₹${newBalance.toFixed(2)}`;
+          
+          if (currentAccount.transactions && currentAccount.transactions.length > 0) {
+            const lastTransaction = currentAccount.transactions[currentAccount.transactions.length - 1];
+            const transactionDate = new Date(lastTransaction.date);
+            document.getElementById('detailTransaction').textContent = 
+              `₹${lastTransaction.amount.toFixed(2)} on ${transactionDate.toLocaleString()}`;
+          } else {
+            document.getElementById('detailTransaction').textContent = "No transactions yet";
+          }
+          
+          accountDetails.classList.remove('hidden');
+        }
+        
+        // Reset form
+        depositForm.reset();
+      });
+    });
+  </script>
+</body>
+</html>
