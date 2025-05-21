@@ -427,56 +427,56 @@
     </div>
   </footer>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      // Check authentication status
-      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-      const customer = JSON.parse(localStorage.getItem('loggedInCustomer') || {});
-      
-      // Get DOM elements
-      const authNav = document.getElementById('authNav');
-      const userNav = document.getElementById('userNav');
-      const customerInfo = document.getElementById('customerInfo');
-      const customerName = document.getElementById('customerName');
-      const customerId = document.getElementById('customerId');
-      const welcomeMessage = document.getElementById('welcomeMessage');
-      const logoutBtn = document.getElementById('logoutBtn');
-      const navLogoutBtn = document.getElementById('navLogoutBtn');
-      const dashboardOptions = document.getElementById('dashboardOptions');
-      const dashboardButtons = document.querySelectorAll('.dashboard-btn');
+ <script>
+  document.addEventListener("DOMContentLoaded", function () {
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const customer = JSON.parse(localStorage.getItem("loggedInCustomer") || "{}");
 
-      if (isLoggedIn && customer.customerId) {
-        // Customer is logged in - show customer-specific UI
-        authNav.classList.add('hidden');
-        userNav.classList.remove('hidden');
-        customerInfo.classList.remove('hidden');
-        
-        // Display customer info
-        customerName.textContent = `${customer.firstName} ${customer.lastName}`;
-        customerId.textContent = `ID: ${customer.customerId}`;
-        welcomeMessage.textContent = `Welcome back, ${customer.firstName}`;
-        
-        // Animate dashboard buttons with staggered delay
-        dashboardButtons.forEach((btn, index) => {
-          btn.style.animation = `fadeIn 0.5s ease ${index * 0.1}s forwards`;
-        });
-      } else {
-        // Customer is not logged in - redirect to login
-        window.location.href = 'login.html';
-        return;
-      }
+  // DOM Elements
+  const authNav = document.getElementById("authNav");
+  const userNav = document.getElementById("userNav");
+  const customerInfo = document.getElementById("customerInfo");
+  const customerName = document.getElementById("customerName");
+  const customerId = document.getElementById("customerId");
+  const welcomeMessage = document.getElementById("welcomeMessage");
+  const logoutBtn = document.getElementById("logoutBtn");
+  const navLogoutBtn = document.getElementById("navLogoutBtn");
+  const dashboardButtons = document.querySelectorAll(".dashboard-btn");
 
-      // Logout functionality
-      function logout(e) {
-        if (e) e.preventDefault();
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('currentCustomer');
-        window.location.href = 'login.html';
-      }
+  if (isLoggedIn && customer.customerId) {
+    // Show logged-in UI
+    authNav.classList.add("hidden");
+    userNav.classList.remove("hidden");
+    customerInfo.classList.remove("hidden");
 
-      logoutBtn.addEventListener('click', logout);
-      navLogoutBtn.addEventListener('click', logout);
+    // Set customer info
+    customerName.textContent = `${customer.firstName} ${customer.lastName}`;
+    customerId.textContent = `ID: ${customer.customerId}`;
+    welcomeMessage.textContent = `Welcome back, ${customer.firstName}`;
+
+    // Animate dashboard buttons
+    dashboardButtons.forEach((btn, index) => {
+      btn.style.animation = `fadeIn 0.5s ease ${index * 0.1}s forwards`;
     });
-  </script>
+  } else {
+    // Not logged in - redirect
+    window.location.href = "login.html";
+    return;
+  }
+
+  // Logout Function
+  function logout(e) {
+    if (e) e.preventDefault();
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("loggedInCustomer");
+    window.location.href = "login.html";
+  }
+
+  // Logout Listeners
+  logoutBtn.addEventListener("click", logout);
+  navLogoutBtn.addEventListener("click", logout);
+});
+
+ </script>
 </body>
 </html>

@@ -6,9 +6,9 @@
   <title>World Bank - Customer Registration</title>
   <style>
     :root {
-      --primary-color: #003366; /* Deep blue - bank primary color */
-      --secondary-color: #0056b3; /* Lighter blue */
-      --accent-color: #ffcc00; /* Gold accent */
+      --primary-color: #003366;
+      --secondary-color: #0056b3;
+      --accent-color: #ffcc00;
       --light-color: #f8f9fa;
       --dark-color: #212529;
       --success-color: #28a745;
@@ -29,7 +29,6 @@
                   url('https://images.unsplash.com/photo-1601597111158-2fceff292cdc?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover;
     }
     
-    /* Header Styles */
     header {
       background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
       padding: 1rem 2rem;
@@ -105,7 +104,6 @@
       color: var(--accent-color);
     }
     
-    /* Main Content Styles */
     main {
       flex: 1;
       display: flex;
@@ -147,7 +145,6 @@
       transform: translateX(-50%);
     }
     
-    /* Form Styles */
     .form-group {
       margin-bottom: 1.5rem;
       position: relative;
@@ -193,7 +190,6 @@
       color: var(--primary-color);
     }
     
-    /* Button Styles */
     .btn {
       display: inline-block;
       padding: 0.8rem 2rem;
@@ -225,7 +221,6 @@
       transform: translateY(1px);
     }
     
-    /* Acknowledgment Screen */
     #acknowledgmentScreen {
       text-align: center;
       display: none;
@@ -273,7 +268,6 @@
       font-weight: 600;
     }
     
-    /* Error Styles */
     .error {
       color: var(--error-color);
       font-size: 0.85rem;
@@ -282,13 +276,11 @@
       font-weight: 500;
     }
     
-    /* Animations */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
     
-    /* Footer Styles */
     footer {
       background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
       color: white;
@@ -307,7 +299,6 @@
       border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
     
-    /* Responsive Design */
     @media (max-width: 768px) {
       .header-container {
         flex-direction: column;
@@ -330,7 +321,8 @@
         background-attachment: fixed;
       }
     }
-     .register-link a {
+    
+    .register-link a {
       color: var(--secondary-color);
       font-weight: 600;
       text-decoration: none;
@@ -442,238 +434,153 @@
     </div>
   </footer>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const registrationForm = document.getElementById('registrationForm');
-      const ackScreen = document.getElementById('acknowledgmentScreen');
-      const formContainer = document.getElementById('registrationFormContainer');
+ <script>
+document.addEventListener("DOMContentLoaded", function() {
+  const registrationForm = document.getElementById('registrationForm');
+  const ackScreen = document.getElementById('acknowledgmentScreen');
+  const formContainer = document.getElementById('registrationFormContainer');
 
-      // Add input event listeners for real-time validation
-      document.getElementById('ssnId').addEventListener('input', validateSsnId);
-      document.getElementById('firstName').addEventListener('input', validateFirstName);
-      document.getElementById('lastName').addEventListener('input', validateLastName);
-      document.getElementById('email').addEventListener('input', validateEmail);
-      document.getElementById('password').addEventListener('input', validatePassword);
-      document.getElementById('confirmPassword').addEventListener('input', validateConfirmPassword);
-      document.getElementById('address').addEventListener('input', validateAddress);
-      document.getElementById('contactNumber').addEventListener('input', validateContactNumber);
+  // LocalStorage setup
+  if (!localStorage.getItem('customers')) {
+    localStorage.setItem('customers', JSON.stringify([]));
+  }
 
-      registrationForm.addEventListener('submit', function(e) {
-        e.preventDefault();
+  // Validation Functions
+  function showError(inputId, message) {
+    const error = document.getElementById(inputId + 'Error');
+    error.textContent = message;
+    error.style.display = 'block';
+    return false;
+  }
 
-        // Get form values
-        const ssnId = document.getElementById('ssnId').value.trim();
-        const firstName = document.getElementById('firstName').value.trim();
-        const lastName = document.getElementById('lastName').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-        const address = document.getElementById('address').value.trim();
-        const contactNumber = document.getElementById('contactNumber').value.trim();
+  function clearError(inputId) {
+    const error = document.getElementById(inputId + 'Error');
+    error.textContent = '';
+    error.style.display = 'none';
+    return true;
+  }
 
-        // Validate all fields
-        const isSsnIdValid = validateSsnId();
-        const isFirstNameValid = validateFirstName();
-        const isLastNameValid = validateLastName();
-        const isEmailValid = validateEmail();
-        const isPasswordValid = validatePassword();
-        const isConfirmPasswordValid = validateConfirmPassword();
-        const isAddressValid = validateAddress();
-        const isContactNumberValid = validateContactNumber();
+  function validateSsnId() {
+    const ssn = document.getElementById('ssnId').value.trim();
+    return /^\d{9}$/.test(ssn) ? clearError('ssnId') : showError('ssnId', 'Enter a valid 9-digit SSN');
+  }
 
-        if (!isSsnIdValid || !isFirstNameValid || !isLastNameValid || !isEmailValid || 
-            !isPasswordValid || !isConfirmPasswordValid || 
-            !isAddressValid || !isContactNumberValid) {
-          return;
-        }
+  function validateFirstName() {
+    const name = document.getElementById('firstName').value.trim();
+    return name.length > 0 ? clearError('firstName') : showError('firstName', 'First name is required');
+  }
 
-        // Generate customer ID
-        const customerId = generateCustomerId();
+  function validateLastName() {
+    const name = document.getElementById('lastName').value.trim();
+    return name.length > 0 ? clearError('lastName') : showError('lastName', 'Last name is required');
+  }
 
-        // Store customer data (simulating database)
-        const customer = {
-          customerId,
-          ssnId,
-          firstName,
-          lastName,
-          email,
-          password,
-          address,
-          contactNumber
-        };
+  function validateEmail() {
+    const email = document.getElementById('email').value.trim();
+    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return pattern.test(email) ? clearError('email') : showError('email', 'Enter a valid email');
+  }
 
-        localStorage.setItem('currentCustomer', JSON.stringify(customer));
+  function validatePassword() {
+    const pass = document.getElementById('password').value;
+    return pass.length >= 6 ? clearError('password') : showError('password', 'Password must be at least 6 characters');
+  }
 
-        // Show acknowledgment
-        showAcknowledgment(customer);
-      });
+  function validateConfirmPassword() {
+    const pass = document.getElementById('password').value;
+    const confirm = document.getElementById('confirmPassword').value;
+    return pass === confirm ? clearError('confirmPassword') : showError('confirmPassword', 'Passwords do not match');
+  }
 
-      document.getElementById('backToLogin').addEventListener('click', function() {
-        window.location.href = 'login.html';
-      });
+  function validateAddress() {
+    const addr = document.getElementById('address').value.trim();
+    return addr.length > 0 ? clearError('address') : showError('address', 'Address is required');
+  }
 
-      // Helper functions
-      function generateCustomerId() {
-        return 'C' + Math.floor(10000000 + Math.random() * 90000000).toString();
-      }
+  function validateContactNumber() {
+    const number = document.getElementById('contactNumber').value.trim();
+    return /^\d{10}$/.test(number) ? clearError('contactNumber') : showError('contactNumber', 'Enter a valid 10-digit number');
+  }
 
-      // Validation functions
-      function validateSsnId() {
-        const ssnId = document.getElementById('ssnId').value.trim();
-        const errorElement = document.getElementById('ssnIdError');
-        
-        if (!ssnId) {
-          errorElement.textContent = 'SSN ID is required';
-          errorElement.style.display = 'block';
-          return false;
-        }
-        
-        if (!/^\d{9}$/.test(ssnId)) {
-          errorElement.textContent = 'SSN ID must be 9 digits';
-          errorElement.style.display = 'block';
-          return false;
-        }
-        
-        errorElement.style.display = 'none';
-        return true;
-      }
+  // Attach real-time validation
+  document.getElementById('ssnId').addEventListener('input', validateSsnId);
+  document.getElementById('firstName').addEventListener('input', validateFirstName);
+  document.getElementById('lastName').addEventListener('input', validateLastName);
+  document.getElementById('email').addEventListener('input', validateEmail);
+  document.getElementById('password').addEventListener('input', validatePassword);
+  document.getElementById('confirmPassword').addEventListener('input', validateConfirmPassword);
+  document.getElementById('address').addEventListener('input', validateAddress);
+  document.getElementById('contactNumber').addEventListener('input', validateContactNumber);
 
-      function validateFirstName() {
-        const firstName = document.getElementById('firstName').value.trim();
-        const errorElement = document.getElementById('firstNameError');
-        
-        if (!firstName) {
-          errorElement.textContent = 'First name is required';
-          errorElement.style.display = 'block';
-          return false;
-        }
-        
-        errorElement.style.display = 'none';
-        return true;
-      }
+  // Form submit
+  registrationForm.addEventListener('submit', function(e) {
+    e.preventDefault();
 
-      function validateLastName() {
-        const lastName = document.getElementById('lastName').value.trim();
-        const errorElement = document.getElementById('lastNameError');
-        
-        if (!lastName) {
-          errorElement.textContent = 'Last name is required';
-          errorElement.style.display = 'block';
-          return false;
-        }
-        
-        errorElement.style.display = 'none';
-        return true;
-      }
+    const ssnId = document.getElementById('ssnId').value.trim();
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const address = document.getElementById('address').value.trim();
+    const contactNumber = document.getElementById('contactNumber').value.trim();
 
-      function validateEmail() {
-        const email = document.getElementById('email').value.trim();
-        const errorElement = document.getElementById('emailError');
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
-        if (!email) {
-          errorElement.textContent = 'Email is required';
-          errorElement.style.display = 'block';
-          return false;
-        }
-        
-        if (!emailRegex.test(email)) {
-          errorElement.textContent = 'Please enter a valid email address';
-          errorElement.style.display = 'block';
-          return false;
-        }
-        
-        errorElement.style.display = 'none';
-        return true;
-      }
+    // Validate all fields
+    const valid = [
+      validateSsnId(),
+      validateFirstName(),
+      validateLastName(),
+      validateEmail(),
+      validatePassword(),
+      validateConfirmPassword(),
+      validateAddress(),
+      validateContactNumber()
+    ];
 
-      function validatePassword() {
-        const password = document.getElementById('password').value;
-        const errorElement = document.getElementById('passwordError');
-        
-        if (!password) {
-          errorElement.textContent = 'Password is required';
-          errorElement.style.display = 'block';
-          return false;
-        }
-        
-        if (password.length < 8) {
-          errorElement.textContent = 'Password must be at least 8 characters';
-          errorElement.style.display = 'block';
-          return false;
-        }
-        
-        errorElement.style.display = 'none';
-        return true;
-      }
+    if (valid.includes(false)) return;
 
-      function validateConfirmPassword() {
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-        const errorElement = document.getElementById('confirmPasswordError');
-        
-        if (!confirmPassword) {
-          errorElement.textContent = 'Please confirm your password';
-          errorElement.style.display = 'block';
-          return false;
-        }
-        
-        if (password !== confirmPassword) {
-          errorElement.textContent = 'Passwords do not match';
-          errorElement.style.display = 'block';
-          return false;
-        }
-        
-        errorElement.style.display = 'none';
-        return true;
-      }
+    const customers = JSON.parse(localStorage.getItem('customers'));
 
-      function validateAddress() {
-        const address = document.getElementById('address').value.trim();
-        const errorElement = document.getElementById('addressError');
-        
-        if (!address) {
-          errorElement.textContent = 'Address is required';
-          errorElement.style.display = 'block';
-          return false;
-        }
-        
-        errorElement.style.display = 'none';
-        return true;
-      }
+    // Check duplicates
+    const ssnExists = customers.some(c => c.ssnId === ssnId);
+    const emailExists = customers.some(c => c.email === email);
 
-      function validateContactNumber() {
-        const contactNumber = document.getElementById('contactNumber').value.trim();
-        const errorElement = document.getElementById('contactNumberError');
-        
-        if (!contactNumber) {
-          errorElement.textContent = 'Contact number is required';
-          errorElement.style.display = 'block';
-          return false;
-        }
-        
-        if (!/^\d{10}$/.test(contactNumber)) {
-          errorElement.textContent = 'Contact number must be 10 digits';
-          errorElement.style.display = 'block';
-          return false;
-        }
-        
-        errorElement.style.display = 'none';
-        return true;
-      }
+    if (ssnExists) return showError('ssnId', 'SSN ID already registered');
+    if (emailExists) return showError('email', 'Email already registered');
 
-      function showAcknowledgment(customer) {
-        // Populate acknowledgment screen
-        document.getElementById('ackCustomerId').textContent = customer.customerId;
-        document.getElementById('ackSsnId').textContent = customer.ssnId;
-        document.getElementById('ackName').textContent = `${customer.firstName} ${customer.lastName}`;
-        document.getElementById('ackEmail').textContent = customer.email;
+    // Generate customer ID
+    const customerId = 'CUST' + (customers.length + 1).toString().padStart(5, '0');
 
-        // Switch views
-        formContainer.style.display = 'none';
-        ackScreen.style.display = 'block';
-      }
-    });
-  </script>
+    // Save new customer
+    const newCustomer = {
+      customerId,
+      ssnId,
+      firstName,
+      lastName,
+      email,
+      password,
+      address,
+      contactNumber
+    };
+
+    customers.push(newCustomer);
+    localStorage.setItem('customers', JSON.stringify(customers));
+
+    // Show acknowledgment
+    document.getElementById('ackCustomerId').textContent = customerId;
+    document.getElementById('ackSsnId').textContent = ssnId;
+    document.getElementById('ackName').textContent = `${firstName} ${lastName}`;
+    document.getElementById('ackEmail').textContent = email;
+
+    formContainer.style.display = 'none';
+    ackScreen.style.display = 'block';
+  });
+
+  // Back to Login
+  document.getElementById('backToLogin').addEventListener('click', function() {
+    window.location.href = 'login.html';
+  });
+});
+</script>
+
 </body>
 </html>

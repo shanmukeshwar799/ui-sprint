@@ -357,43 +357,50 @@
     document.addEventListener("DOMContentLoaded", function() {
       // Check if user is logged in
       const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-      const currentUser = JSON.parse(localStorage.getItem('loggedInCustomer') || JSON.parse(localStorage.getItem('currentCustomer') || '{}'));
+      const currentUser = JSON.parse(localStorage.getItem('loggedInCustomer') || '{}');
       
-      if (!isLoggedIn || !currentUser.firstName) {
+      if (!isLoggedIn || !currentUser.customerId) {
         window.location.href = 'login.html';
         return;
       }
       
       // Display user info in header
-      const userInfo = document.getElementById('userInfo');
       const userName = document.getElementById('userName');
       const userId = document.getElementById('userId');
       
       userName.textContent = `${currentUser.firstName} ${currentUser.lastName}`;
-      userId.textContent = currentUser.empId ? `EMP ID: ${currentUser.empId}` : `CUST ID: ${currentUser.customerId}`;
+      userId.textContent = `CUST ID: ${currentUser.customerId}`;
       
       // Logout functionality
       document.getElementById('logoutBtn').addEventListener('click', function(e) {
         e.preventDefault();
         localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('loggedInEmployee');
-        localStorage.removeItem('currentCustomer');
+        localStorage.removeItem('loggedInCustomer');
         window.location.href = 'login.html';
       });
       
       // Get customer accounts from localStorage
       let accounts = JSON.parse(localStorage.getItem('customerAccounts') || '[]');
       
-      // For demo purposes, use the first account if available
-      let currentAccount = accounts.length > 0 ? accounts[0] : null;
+      // Find the account for the current customer
+      let currentAccount = accounts.find(acc => acc.customerId === currentUser.customerId);
+      
+      // If no account exists for this customer, create one with default balance
+      if (!currentAccount) {
+        currentAccount = {
+          accountNumber: 'ACC' + Math.floor(10000000 + Math.random() * 90000000).toString(),
+          customerId: currentUser.customerId,
+          accountType: 'Savings',
+          accountBalance: 10000.00, // Default balance
+          openedDate: new Date().toISOString().split('T')[0]
+        };
+        accounts.push(currentAccount);
+        localStorage.setItem('customerAccounts', JSON.stringify(accounts));
+      }
       
       // Display current balance
       const currentBalanceElement = document.getElementById('currentBalance');
-      if (currentAccount) {
-        currentBalanceElement.textContent = currentAccount.accountBalance.toFixed(2);
-      } else {
-        currentBalanceElement.textContent = "0.00";
-      }
+      currentBalanceElement.textContent = currentAccount.accountBalance.toFixed(2);
       
       // Withdrawal form submission
       const withdrawalForm = document.getElementById('withdrawalForm');
@@ -410,7 +417,7 @@
         
         // Get withdrawal amount
         const withdrawalAmount = parseFloat(document.getElementById('withdrawalAmount').value);
-        const currentBalance = currentAccount ? parseFloat(currentAccount.accountBalance) : 0;
+        const currentBalance = parseFloat(currentAccount.accountBalance);
         
         // Validate withdrawal
         if (withdrawalAmount < 1000) {
@@ -430,15 +437,13 @@
         const newBalance = currentBalance - withdrawalAmount;
         
         // Update account balance
-        if (currentAccount) {
-          currentAccount.accountBalance = newBalance;
-          
-          // Update in localStorage
-          const accountIndex = accounts.findIndex(acc => acc.accountNumber === currentAccount.accountNumber);
-          if (accountIndex !== -1) {
-            accounts[accountIndex] = currentAccount;
-            localStorage.setItem('customerAccounts', JSON.stringify(accounts));
-          }
+        currentAccount.accountBalance = newBalance;
+        
+        // Update in localStorage
+        const accountIndex = accounts.findIndex(acc => acc.accountNumber === currentAccount.accountNumber);
+        if (accountIndex !== -1) {
+          accounts[accountIndex] = currentAccount;
+          localStorage.setItem('customerAccounts', JSON.stringify(accounts));
         }
         
         // Show success message

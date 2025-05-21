@@ -353,86 +353,96 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      // Check if user is logged in
-      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-      const currentUser = JSON.parse(localStorage.getItem('loggedInCustomer') || JSON.parse(localStorage.getItem('currentCustomer') || '{}'));
-      
-      if (!isLoggedIn || !currentUser.firstName) {
-        window.location.href = 'login.html';
-        return;
-      }
-      
-      // Display user info in header
-      const userInfo = document.getElementById('userInfo');
-      const userName = document.getElementById('userName');
-      const userId = document.getElementById('userId');
-      
-      userName.textContent = `${currentUser.firstName} ${currentUser.lastName}`;
-      userId.textContent = currentUser.empId ? `EMP ID: ${currentUser.empId}` : `CUST ID: ${currentUser.customerId}`;
-      
-      // Logout functionality
-      document.getElementById('logoutBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('loggedInEmployee');
-        localStorage.removeItem('currentCustomer');
-        window.location.href = 'login.html';
-      });
-      
-      // Get customer accounts from localStorage
-      let accounts = JSON.parse(localStorage.getItem('customerAccounts') || '[]');
-      
-      // Calculate total balance
-      const totalBalance = accounts.reduce((sum, account) => sum + account.accountBalance, 0);
-      document.getElementById('totalBalance').textContent = totalBalance.toFixed(2);
-      
-      // Display account cards
-      const accountCardsContainer = document.getElementById('accountCards');
-      
-      if (accounts.length === 0) {
-        accountCardsContainer.innerHTML = `
-          <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">
-            <i class="fas fa-wallet" style="font-size: 3rem; color: var(--secondary-color); opacity: 0.5; margin-bottom: 1rem;"></i>
-            <p style="color: var(--primary-color);">No accounts found</p>
+  // Check if user is logged in
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+  let currentUser = localStorage.getItem('loggedInCustomer');
+  if (!currentUser) {
+    currentUser = localStorage.getItem('currentCustomer') || '{}';
+  }
+  currentUser = JSON.parse(currentUser);
+
+  if (!isLoggedIn || !currentUser.firstName) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  // Display user info in header
+  const userName = document.getElementById('userName');
+  const userId = document.getElementById('userId');
+
+  userName.textContent = `${currentUser.firstName} ${currentUser.lastName}`;
+  userId.textContent = currentUser.empId ? `EMP ID: ${currentUser.empId}` : `CUST ID: ${currentUser.customerId}`;
+
+  // Logout functionality
+  document.getElementById('logoutBtn').addEventListener('click', function(e) {
+    e.preventDefault();
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('loggedInEmployee');
+    localStorage.removeItem('loggedInCustomer');
+    localStorage.removeItem('currentCustomer');
+    window.location.href = 'login.html';
+  });
+
+  // Get customer accounts from localStorage
+  let accounts = JSON.parse(localStorage.getItem('customerAccounts') || '[]');
+
+  // Calculate total balance
+  const totalBalance = accounts.reduce((sum, account) => sum + (account.accountBalance || 0), 0);
+  document.getElementById('totalBalance').textContent = totalBalance.toFixed(2);
+
+  // Display account cards
+  const accountCardsContainer = document.getElementById('accountCards');
+
+  if (accounts.length === 0) {
+    accountCardsContainer.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">
+        <i class="fas fa-wallet" style="font-size: 3rem; color: var(--secondary-color); opacity: 0.5; margin-bottom: 1rem;"></i>
+        <p style="color: var(--primary-color);">No accounts found</p>
+      </div>
+    `;
+  } else {
+    accounts.forEach(account => {
+      const accNumStr = account.accountNumber ? account.accountNumber.toString() : '0000';
+      const last4 = accNumStr.slice(-4);
+
+      const lastTxn = account.transactions && account.transactions.length > 0 
+        ? new Date(account.transactions[account.transactions.length - 1].date) 
+        : null;
+      const lastTxnDate = (lastTxn && !isNaN(lastTxn)) ? lastTxn.toLocaleDateString() : 'N/A';
+
+      const accountCard = document.createElement('div');
+      accountCard.className = 'account-card';
+      accountCard.innerHTML = `
+        <div class="account-card-header">
+          <span class="account-type">${account.accountType || 'Savings Account'}</span>
+          <span class="account-number">•••• ${last4}</span>
+        </div>
+        <div class="account-balance">₹${(account.accountBalance || 0).toFixed(2)}</div>
+        <div class="account-details">
+          <div class="account-detail">
+            <span class="detail-label">Account Holder</span>
+            <span class="detail-value">${account.customerName}</span>
           </div>
-        `;
-      } else {
-        accounts.forEach(account => {
-          const accountCard = document.createElement('div');
-          accountCard.className = 'account-card';
-          accountCard.innerHTML = `
-            <div class="account-card-header">
-              <span class="account-type">${account.accountType || 'Savings Account'}</span>
-              <span class="account-number">•••• ${account.accountNumber.slice(-4)}</span>
-            </div>
-            <div class="account-balance">₹${account.accountBalance.toFixed(2)}</div>
-            <div class="account-details">
-              <div class="account-detail">
-                <span class="detail-label">Account Holder</span>
-                <span class="detail-value">${account.customerName}</span>
-              </div>
-              <div class="account-detail">
-                <span class="detail-label">IFSC Code</span>
-                <span class="detail-value">${account.ifscCode}</span>
-              </div>
-              <div class="account-detail">
-                <span class="detail-label">Status</span>
-                <span class="detail-value" style="color: var(--success-color);">Active</span>
-              </div>
-              <div class="account-detail">
-                <span class="detail-label">Last Transaction</span>
-                <span class="detail-value">
-                  ${account.transactions && account.transactions.length > 0 ? 
-                    new Date(account.transactions[account.transactions.length - 1].date).toLocaleDateString() : 
-                    'N/A'}
-                </span>
-              </div>
-            </div>
-          `;
-          accountCardsContainer.appendChild(accountCard);
-        });
-      }
+          <div class="account-detail">
+            <span class="detail-label">IFSC Code</span>
+            <span class="detail-value">${account.ifscCode}</span>
+          </div>
+          <div class="account-detail">
+            <span class="detail-label">Status</span>
+            <span class="detail-value" style="color: var(--success-color);">Active</span>
+          </div>
+          <div class="account-detail">
+            <span class="detail-label">Last Transaction</span>
+            <span class="detail-value">${lastTxnDate}</span>
+          </div>
+        </div>
+      `;
+      accountCardsContainer.appendChild(accountCard);
     });
+  }
+});
+
   </script>
 </body>
 </html>

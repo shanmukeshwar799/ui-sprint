@@ -369,99 +369,93 @@
     </div>
   </footer>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const loginForm = document.getElementById('loginForm');
-      const successBox = document.getElementById('successBox');
-      
-      // Add input event listeners for real-time validation
-      document.getElementById('ssnId').addEventListener('input', validateSsnId);
-      document.getElementById('password').addEventListener('input', validatePassword);
-      
-      loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Get form values
-        const ssnId = document.getElementById('ssnId').value.trim();
-        const password = document.getElementById('password').value;
-        
-        // Validate all fields
-        const isSsnIdValid = validateSsnId();
-        const isPasswordValid = validatePassword();
-        
-        if (!isSsnIdValid || !isPasswordValid) {
-          return;
-        }
-        
-        // Check if customer exists (simulating database check)
-        const storedCustomer = localStorage.getItem('currentCustomer');
-        
-        if (storedCustomer) {
-          const customer = JSON.parse(storedCustomer);
-          
-          if (customer.ssnId === ssnId && customer.password === password) {
-            // Show success message
-            successBox.style.display = 'flex';
-            
-            // Store login status
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('loggedInCustomer', JSON.stringify(customer));
-            
-            // Redirect to home page after 2 seconds
-            setTimeout(() => {
-              window.location.href = 'home.html';
-            }, 2000);
-          } else {
-            showError('passwordError', 'Invalid SSN ID or password');
-          }
-        } else {
-          showError('passwordError', 'No account found with this SSN ID');
-        }
-      });
-      
-      // Validation functions
-      function validateSsnId() {
-        const ssnId = document.getElementById('ssnId').value.trim();
-        const errorElement = document.getElementById('ssnIdError');
-        
-        if (!ssnId) {
-          showError('ssnIdError', 'SSN ID is required');
-          return false;
-        }
-        
-        if (!/^\d{9}$/.test(ssnId)) {
-          showError('ssnIdError', 'SSN ID must be 9 digits');
-          return false;
-        }
-        
-        hideError('ssnIdError');
-        return true;
+ <script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const loginForm = document.getElementById('loginForm');
+    const successBox = document.getElementById('successBox');
+
+    // Add input event listeners for real-time validation
+    document.getElementById('ssnId').addEventListener('input', validateSsnId);
+    document.getElementById('password').addEventListener('input', validatePassword);
+
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const ssnId = document.getElementById('ssnId').value.trim();
+      const password = document.getElementById('password').value;
+
+      const isSsnIdValid = validateSsnId();
+      const isPasswordValid = validatePassword();
+
+      if (!isSsnIdValid || !isPasswordValid) return;
+
+      // Read all customers from localStorage
+      const customerData = localStorage.getItem('customers');
+      if (!customerData) {
+        showError('passwordError', 'No customers registered.');
+        return;
       }
-      
-      function validatePassword() {
-        const password = document.getElementById('password').value;
-        const errorElement = document.getElementById('passwordError');
-        
-        if (!password) {
-          showError('passwordError', 'Password is required');
-          return false;
-        }
-        
-        hideError('passwordError');
-        return true;
+
+      const customers = JSON.parse(customerData);
+      const customer = customers.find(c => c.ssnId === ssnId);
+
+      if (!customer) {
+        showError('ssnIdError', 'SSN ID not found.');
+        return;
       }
-      
-      function showError(elementId, message) {
-        const errorElement = document.getElementById(elementId);
-        errorElement.textContent = message;
-        errorElement.style.display = 'block';
+
+      if (customer.password !== password) {
+        showError('passwordError', 'Incorrect password.');
+        return;
       }
-      
-      function hideError(elementId) {
-        const errorElement = document.getElementById(elementId);
-        errorElement.style.display = 'none';
-      }
+
+      // Success login
+      successBox.style.display = 'flex';
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('loggedInCustomer', JSON.stringify(customer));
+
+      setTimeout(() => {
+        window.location.href = 'home.html';
+      }, 2000);
     });
-  </script>
+
+    // Validation functions
+    function validateSsnId() {
+      const ssnId = document.getElementById('ssnId').value.trim();
+      if (!ssnId) {
+        showError('ssnIdError', 'SSN ID is required');
+        return false;
+      }
+      if (!/^\d{9}$/.test(ssnId)) {
+        showError('ssnIdError', 'SSN ID must be 9 digits');
+        return false;
+      }
+      hideError('ssnIdError');
+      return true;
+    }
+
+    function validatePassword() {
+      const password = document.getElementById('password').value;
+      if (!password) {
+        showError('passwordError', 'Password is required');
+        return false;
+      }
+      hideError('passwordError');
+      return true;
+    }
+
+    function showError(id, message) {
+      const el = document.getElementById(id);
+      el.textContent = message;
+      el.style.display = 'block';
+    }
+
+    function hideError(id) {
+      const el = document.getElementById(id);
+      el.style.display = 'none';
+    }
+  });
+</script>
+
 </body>
 </html>
