@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>World Bank - Customer Dashboard</title>
+  <title>GVK Bank - Customer Dashboard</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
   <style>
     :root {
@@ -156,6 +156,11 @@
       background: linear-gradient(135deg, #ffdb58, var(--accent-color));
       transform: translateY(-3px);
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .highlight-name {
+      color: #003366;
+      font-weight: bold;
     }
 
     /* Horizontal Dashboard Options */
@@ -351,7 +356,7 @@
   <header>
     <div class="header-container">
       <div class="logo" onclick="location.href='index.html'">
-        <h1>World<span>Bank</span></h1>
+        <h1>GVK<span>Bank</span></h1>
       </div>
       <div class="customer-info hidden" id="customerInfo">
         <i class="fas fa-user"></i>
@@ -361,7 +366,7 @@
         <ul class="auth-nav hidden" id="authNav">
           <li><a href="login.html">Login</a></li>
           <li><a href="register.html">Register</a></li>
-          <li><a href="contact.html">Contact Us</a></li>
+         
         </ul>
         <ul class="user-nav" id="userNav">
           <li><a href="#" id="navLogoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
@@ -387,96 +392,68 @@
       </a>
       <a href="deposite.html" class="dashboard-btn">
         <span class="btn-icon"><i class="fas fa-credit-card"></i></span>
-        <span class="btn-text">Deposite</span>
+        <span class="btn-text">Deposit</span>
       </a>
       <a href="checkbalanceandhistory.html" class="dashboard-btn">
         <span class="btn-icon"><i class="fas fa-history"></i></span>
         <span class="btn-text">View Balance</span>
       </a>
-      
     </div>
   </div>
 
   <footer>
-    <div class="footer-container">
-      <div class="footer-about">
-        <div class="footer-logo">World<span>Bank</span></div>
-        <p>Providing innovative banking solutions since 1985. Your trusted financial partner.</p>
-      </div>
-      
-      <div class="footer-links">
-        <h3>Quick Links</h3>
-        <ul>
-          <li><a href="accounts.html">My Accounts</a></li>
-          <li><a href="transfer.html">Transfer Money</a></li>
-          <li><a href="contact.html">Contact Us</a></li>
-          <li><a href="#">Privacy Policy</a></li>
-        </ul>
-      </div>
-      
-      <div class="footer-contact">
-        <h3>Contact Us</h3>
-        <p><i class="fas fa-phone"></i> (123) 456-7890</p>
-        <p><i class="fas fa-envelope"></i> support@worldbank.com</p>
-        <p><i class="fas fa-map-marker-alt"></i> 123 Financial District, New York, NY 10005</p>
-      </div>
-    </div>
     
     <div class="footer-bottom">
-      <p>&copy; 2025 World Bank. All rights reserved.</p>
+      <p>&copy; 2025 GVK Bank. All rights reserved.</p>
     </div>
   </footer>
 
- <script>
+<script>
   document.addEventListener("DOMContentLoaded", function () {
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-  const customer = JSON.parse(localStorage.getItem("loggedInCustomer") || "{}");
+    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+    const customer = JSON.parse(localStorage.getItem("loggedInCustomer") || "{}");
 
-  // DOM Elements
-  const authNav = document.getElementById("authNav");
-  const userNav = document.getElementById("userNav");
-  const customerInfo = document.getElementById("customerInfo");
-  const customerName = document.getElementById("customerName");
-  const customerId = document.getElementById("customerId");
-  const welcomeMessage = document.getElementById("welcomeMessage");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const navLogoutBtn = document.getElementById("navLogoutBtn");
-  const dashboardButtons = document.querySelectorAll(".dashboard-btn");
+    const authNav = document.getElementById("authNav");
+    const userNav = document.getElementById("userNav");
+    const customerInfo = document.getElementById("customerInfo");
+    const customerName = document.getElementById("customerName");
+    const customerId = document.getElementById("customerId");
+    const welcomeMessage = document.getElementById("welcomeMessage");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const navLogoutBtn = document.getElementById("navLogoutBtn");
+    const dashboardButtons = document.querySelectorAll(".dashboard-btn");
 
-  if (isLoggedIn && customer.customerId) {
-    // Show logged-in UI
-    authNav.classList.add("hidden");
-    userNav.classList.remove("hidden");
-    customerInfo.classList.remove("hidden");
+    if (isLoggedIn && customer && customer.customerId) {
+      if (authNav) authNav.classList.add("hidden");
+      if (userNav) userNav.classList.remove("hidden");
+      if (customerInfo) customerInfo.classList.remove("hidden");
 
-    // Set customer info
-    customerName.textContent = `${customer.firstName} ${customer.lastName}`;
-    customerId.textContent = `ID: ${customer.customerId}`;
-    welcomeMessage.textContent = `Welcome back, ${customer.firstName}`;
+      if (customerName) customerName.textContent = `${customer.firstName} ${customer.lastName}`;
+      if (customerId) customerId.textContent = `ID: ${customer.customerId}`;
+      if (welcomeMessage) {
+        welcomeMessage.innerHTML = ` <span class="highlight-name"> welcome back ${customer.firstName}</span>`;
+      }
 
-    // Animate dashboard buttons
-    dashboardButtons.forEach((btn, index) => {
-      btn.style.animation = `fadeIn 0.5s ease ${index * 0.1}s forwards`;
-    });
-  } else {
-    // Not logged in - redirect
-    window.location.href = "login.html";
-    return;
-  }
+      if (dashboardButtons) {
+        dashboardButtons.forEach((btn, index) => {
+          btn.style.animation = `fadeIn 0.5s ease ${index * 0.1}s forwards`;
+        });
+      }
+    } else {
+      window.location.href = "login.html";
+      return;
+    }
 
-  // Logout Function
-  function logout(e) {
-    if (e) e.preventDefault();
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("loggedInCustomer");
-    window.location.href = "login.html";
-  }
+    function logout(e) {
+      if (e) e.preventDefault();
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("loggedInCustomer");
+      window.location.href = "login.html";
+    }
 
-  // Logout Listeners
-  logoutBtn.addEventListener("click", logout);
-  navLogoutBtn.addEventListener("click", logout);
-});
-
- </script>
+    if (logoutBtn) logoutBtn.addEventListener("click", logout);
+    if (navLogoutBtn) navLogoutBtn.addEventListener("click", logout);
+  });
+</script>
 </body>
 </html>

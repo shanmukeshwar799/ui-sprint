@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>World Bank - Account Balance</title>
+  <title>GVK Bank - Account Balance</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <style>
     :root {
@@ -313,7 +313,7 @@
   <header>
     <div class="header-container">
       <div class="logo" onclick="location.href='index.html'">
-        <h1>World<span>Bank</span></h1>
+        <h1>GVK<span>Bank</span></h1>
       </div>
       <div class="user-info" id="userInfo">
         <i class="fas fa-user-circle"></i>
@@ -329,6 +329,13 @@
   
   <main>
     <div class="balance-container">
+
+      <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+  <a href="javascript:history.back()" class="btn-back" title="Go Back">
+    <i class="fas fa-arrow-left"></i> Back
+  </a>
+ 
+</div>
       <h2>Account Balance</h2>
       
       <div class="balance-summary">
@@ -346,103 +353,95 @@
   <footer>
     <div class="footer-container">
       <div class="footer-bottom">
-        <p>&copy; 2025 World Bank. All rights reserved. | Phone: (123) 456-7890</p>
+        <p>&copy; 2025 GVK Bank. All rights reserved. | Phone: (123) 456-7890</p>
       </div>
     </div>
   </footer>
 
-  <script>
+<script>
     document.addEventListener("DOMContentLoaded", function() {
-  // Check if user is logged in
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-
-  let currentUser = localStorage.getItem('loggedInCustomer');
-  if (!currentUser) {
-    currentUser = localStorage.getItem('currentCustomer') || '{}';
-  }
-  currentUser = JSON.parse(currentUser);
-
-  if (!isLoggedIn || !currentUser.firstName) {
-    window.location.href = 'login.html';
-    return;
-  }
-
-  // Display user info in header
-  const userName = document.getElementById('userName');
-  const userId = document.getElementById('userId');
-
-  userName.textContent = `${currentUser.firstName} ${currentUser.lastName}`;
-  userId.textContent = currentUser.empId ? `EMP ID: ${currentUser.empId}` : `CUST ID: ${currentUser.customerId}`;
-
-  // Logout functionality
-  document.getElementById('logoutBtn').addEventListener('click', function(e) {
-    e.preventDefault();
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('loggedInEmployee');
-    localStorage.removeItem('loggedInCustomer');
-    localStorage.removeItem('currentCustomer');
-    window.location.href = 'login.html';
-  });
-
-  // Get customer accounts from localStorage
-  let accounts = JSON.parse(localStorage.getItem('customerAccounts') || '[]');
-
-  // Calculate total balance
-  const totalBalance = accounts.reduce((sum, account) => sum + (account.accountBalance || 0), 0);
-  document.getElementById('totalBalance').textContent = totalBalance.toFixed(2);
-
-  // Display account cards
-  const accountCardsContainer = document.getElementById('accountCards');
-
-  if (accounts.length === 0) {
-    accountCardsContainer.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">
-        <i class="fas fa-wallet" style="font-size: 3rem; color: var(--secondary-color); opacity: 0.5; margin-bottom: 1rem;"></i>
-        <p style="color: var(--primary-color);">No accounts found</p>
-      </div>
-    `;
-  } else {
-    accounts.forEach(account => {
-      const accNumStr = account.accountNumber ? account.accountNumber.toString() : '0000';
-      const last4 = accNumStr.slice(-4);
-
-      const lastTxn = account.transactions && account.transactions.length > 0 
-        ? new Date(account.transactions[account.transactions.length - 1].date) 
-        : null;
-      const lastTxnDate = (lastTxn && !isNaN(lastTxn)) ? lastTxn.toLocaleDateString() : 'N/A';
-
-      const accountCard = document.createElement('div');
-      accountCard.className = 'account-card';
-      accountCard.innerHTML = `
-        <div class="account-card-header">
-          <span class="account-type">${account.accountType || 'Savings Account'}</span>
-          <span class="account-number">•••• ${last4}</span>
-        </div>
-        <div class="account-balance">₹${(account.accountBalance || 0).toFixed(2)}</div>
-        <div class="account-details">
-          <div class="account-detail">
-            <span class="detail-label">Account Holder</span>
-            <span class="detail-value">${account.customerName}</span>
+      // Check if user is logged in
+      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      const currentUser = JSON.parse(localStorage.getItem('loggedInCustomer') || '{}');
+      
+      if (!isLoggedIn || !currentUser.customerId) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Display user info in header
+      const userName = document.getElementById('userName');
+      const userId = document.getElementById('userId');
+      
+      userName.textContent = `${currentUser.firstName} ${currentUser.lastName}`;
+      userId.textContent = `CUST ID: ${currentUser.customerId}`;
+      
+      // Logout functionality
+      document.getElementById('logoutBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('loggedInCustomer');
+        window.location.href = 'login.html';
+      });
+      
+      // Get customer account from localStorage (single account)
+      const customerAccount = JSON.parse(localStorage.getItem('customerAccount') || '{}');
+      
+      // Display balance information
+      const totalBalanceElement = document.getElementById('totalBalance');
+      const accountCardsContainer = document.getElementById('accountCards');
+      
+      if (customerAccount.accountNumber) {
+        // Show the actual balance
+        const balance = customerAccount.accountBalance || 0;
+        totalBalanceElement.textContent = balance.toFixed(2);
+        
+        // Create account card
+        const last4 = customerAccount.accountNumber.slice(-4);
+        const lastTxn = customerAccount.transactions && customerAccount.transactions.length > 0 
+          ? new Date(customerAccount.transactions[customerAccount.transactions.length - 1].date) 
+          : null;
+        const lastTxnDate = lastTxn ? lastTxn.toLocaleDateString() : 'N/A';
+        
+        accountCardsContainer.innerHTML = `
+          <div class="account-card">
+            <div class="account-card-header">
+              <span class="account-type">${customerAccount.accountType || 'Savings Account'}</span>
+              <span class="account-number">•••• ${last4}</span>
+            </div>
+            <div class="account-balance">₹${balance.toFixed(2)}</div>
+            <div class="account-details">
+              <div class="account-detail">
+                <span class="detail-label">Account Holder</span>
+                <span class="detail-value">${currentUser.firstName} ${currentUser.lastName}</span>
+              </div>
+              <div class="account-detail">
+                <span class="detail-label">Account Number</span>
+                <span class="detail-value">${customerAccount.accountNumber}</span>
+              </div>
+              <div class="account-detail">
+                <span class="detail-label">Status</span>
+                <span class="detail-value" style="color: var(--success-color);">Active</span>
+              </div>
+              <div class="account-detail">
+                <span class="detail-label">Last Transaction</span>
+                <span class="detail-value">${lastTxnDate}</span>
+              </div>
+            </div>
           </div>
-          <div class="account-detail">
-            <span class="detail-label">IFSC Code</span>
-            <span class="detail-value">${account.ifscCode}</span>
+        `;
+      } else {
+        // No account found
+        totalBalanceElement.textContent = '0.00';
+        accountCardsContainer.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 2rem;">
+            <i class="fas fa-wallet" style="font-size: 3rem; color: var(--secondary-color); opacity: 0.5; margin-bottom: 1rem;"></i>
+            <p style="color: var(--primary-color);">No account found</p>
+            <p><a href="create-account.html" style="color: var(--secondary-color); text-decoration: underline;">Create an account</a></p>
           </div>
-          <div class="account-detail">
-            <span class="detail-label">Status</span>
-            <span class="detail-value" style="color: var(--success-color);">Active</span>
-          </div>
-          <div class="account-detail">
-            <span class="detail-label">Last Transaction</span>
-            <span class="detail-value">${lastTxnDate}</span>
-          </div>
-        </div>
-      `;
-      accountCardsContainer.appendChild(accountCard);
+        `;
+      }
     });
-  }
-});
-
   </script>
 </body>
 </html>

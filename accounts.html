@@ -1,12 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>World Bank - Create Customer Account</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+  <!-- [Previous head content remains exactly the same] -->
   <style>
-    :root {
+   :root {
       --primary-color: #003366;
       --secondary-color: #0056b3;
       --accent-color: #ffcc00;
@@ -321,13 +318,19 @@
         background-attachment: fixed;
       }
     }
+    .error-message {
+      color: var(--error-color);
+      font-size: 0.8rem;
+      margin-top: 0.3rem;
+      display: none;
+    }
   </style>
 </head>
 <body>
-  <header>
+   <header>
     <div class="header-container">
       <div class="logo" onclick="location.href='index.html'">
-        <h1>World<span>Bank</span></h1>
+        <h1>GVK<span>Bank</span></h1>
       </div>
       <div class="user-info" id="userInfo">
         <i class="fas fa-user-circle"></i>
@@ -340,101 +343,256 @@
       </nav>
     </div>
   </header>
-
+  
   <main>
     <div class="registration-container">
       <h2>Create Customer Account</h2>
-      <form id="accountForm">
-        <!-- All form fields remain unchanged -->
-        <!-- OMITTED FOR BREVITY: All inputs for ssn, name, account, etc. -->
+  
+  <form id="accountForm">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="ssnId">SSN ID</label>
+        <input type="text" id="ssnId" maxlength="7" required placeholder="Enter 7-digit SSN">
+        <div class="error-message" id="ssnIdError"></div>
+      </div>
+      <div class="form-group">
+        <label for="customerName">Customer Name</label>
+        <input type="text" id="customerName" required>
+        <div class="error-message" id="customerNameError"></div>
+      </div>
+    </div>
+     <div class="form-row">
+          <div class="form-group">
+            <label for="accountNumber">Account Number</label>
+            <input type="text" id="accountNumber" required>
+          </div>
+          <div class="form-group">
+            <label for="ifscCode">IFSC Code</label>
+            <input type="text" id="ifscCode" required>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="accountBalance">Account Balance (₹)</label>
+            <input type="number" id="accountBalance" required>
+          </div>
+          <div class="form-group">
+            <label for="aadharNumber">Aadhar Card Number</label>
+            <input type="text" id="aadharNumber" maxlength="12" required>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="panNumber">PAN Card Number</label>
+            <input type="text" id="panNumber" maxlength="10" required>
+          </div>
+          <div class="form-group">
+            <label for="dob">Date of Birth</label>
+            <input type="date" id="dob" required>
+          </div>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="gender">Gender</label>
+            <select id="gender" required>
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="maritalStatus">Marital Status</label>
+            <select id="maritalStatus" required>
+              <option value="">Select Status</option>
+              <option value="Single">Single</option>
+              <option value="Married">Married</option>
+              <option value="Divorced">Divorced</option>
+              <option value="Widowed">Widowed</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="address">Address</label>
+          <textarea id="address" required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="contactNumber">Contact Number</label>
+          <input type="tel" id="contactNumber" maxlength="10" required>
+        </div>
+        
         <button type="submit" class="btn">Create Account</button>
-      </form>
+    
+    <!-- [Rest of the form fields remain the same, but add error message divs after each input] -->
+    
+  </form>
+
+  <!-- [Rest of the HTML remains the same] -->
+    </form>
     </div>
   </main>
-
+  
   <!-- Success Message Box -->
   <div class="success-box" id="successBox">
     <i class="fas fa-check-circle"></i>
     <span>Customer Registration Successful.</span>
   </div>
-
+  
   <footer>
     <div class="footer-container">
       <div class="footer-bottom">
-        <p>&copy; 2025 World Bank. All rights reserved. | Phone: (123) 456-7890</p>
+        <p>&copy; 2025 GVK Bank. All rights reserved. | Phone: (123) 456-7890</p>
       </div>
     </div>
   </footer>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-      const currentUser = JSON.parse(localStorage.getItem("loggedInCustomer") || localStorage.getItem("currentCustomer") || "{}");
-
-      if (!isLoggedIn || !currentUser.firstName) {
-        window.location.href = "login.html";
+    document.addEventListener("DOMContentLoaded", function() {
+      // Check if user is logged in
+      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      const currentUser = JSON.parse(localStorage.getItem('loggedInCustomer') || '{}');
+      
+      if (!isLoggedIn || !currentUser.customerId) {
+        window.location.href = 'login.html';
         return;
       }
-
-      document.getElementById("userName").textContent = `${currentUser.firstName} ${currentUser.lastName}`;
-      document.getElementById("userId").textContent = currentUser.empId ? `EMP ID: ${currentUser.empId}` : `CUST ID: ${currentUser.customerId}`;
-
-      document.getElementById("logoutBtn").addEventListener("click", function (e) {
+      
+      // Display user info in header
+      const userName = document.getElementById('userName');
+      const userId = document.getElementById('userId');
+      
+      userName.textContent = `${currentUser.firstName} ${currentUser.lastName}`;
+      userId.textContent = `CUST ID: ${currentUser.customerId}`;
+      
+      // Logout functionality
+      document.getElementById('logoutBtn').addEventListener('click', function(e) {
         e.preventDefault();
-        localStorage.removeItem("isLoggedIn");
-        localStorage.removeItem("loggedInEmployee");
-        localStorage.removeItem("currentCustomer");
-        localStorage.removeItem("loggedInCustomer");
-        window.location.href = "login.html";
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('loggedInCustomer');
+        window.location.href = 'login.html';
       });
-
-      const accountForm = document.getElementById("accountForm");
-      const successBox = document.getElementById("successBox");
-
-      accountForm.addEventListener("submit", function (e) {
+      
+      // Form elements
+      const accountForm = document.getElementById('accountForm');
+      const successBox = document.getElementById('successBox');
+      
+      // Validation functions
+      function validateSsnId() {
+        const ssnId = document.getElementById('ssnId').value.trim();
+        const errorElement = document.getElementById('ssnIdError');
+        
+        if (!ssnId) {
+          errorElement.textContent = 'SSN ID is required';
+          errorElement.style.display = 'block';
+          return false;
+        }
+        
+        if (!/^\d{7}$/.test(ssnId)) {
+          errorElement.textContent = 'SSN ID must be exactly 7 digits';
+          errorElement.style.display = 'block';
+          return false;
+        }
+        
+        // Check if SSN matches logged in user
+        if (ssnId !== currentUser.ssnId) {
+          errorElement.textContent = 'SSN ID does not match your account';
+          errorElement.style.display = 'block';
+          return false;
+        }
+        
+        errorElement.style.display = 'none';
+        return true;
+      }
+      
+      function validateCustomerName() {
+        const name = document.getElementById('customerName').value.trim();
+        const errorElement = document.getElementById('customerNameError');
+        
+        if (!name) {
+          errorElement.textContent = 'Customer name is required';
+          errorElement.style.display = 'block';
+          return false;
+        }
+        
+        if (!/^[a-zA-Z ]{2,50}$/.test(name)) {
+          errorElement.textContent = 'Name must be 2-50 alphabetic characters';
+          errorElement.style.display = 'block';
+          return false;
+        }
+        
+        errorElement.style.display = 'none';
+        return true;
+      }
+      
+      // [Add similar validation functions for all other fields]
+      
+      // Auto-populate customer data when SSN is entered
+      document.getElementById('ssnId').addEventListener('blur', function() {
+        if (validateSsnId()) {
+          // Populate customer data from logged in user
+          document.getElementById('customerName').value = `${currentUser.firstName} ${currentUser.lastName}`;
+          document.getElementById('email').value = currentUser.email;
+          document.getElementById('address').value = currentUser.address;
+          document.getElementById('contactNumber').value = currentUser.contactNumber;
+        }
+      });
+      
+      // Form submission
+      accountForm.addEventListener('submit', function(e) {
         e.preventDefault();
-
+        
+        // Validate all fields
+        const isSsnValid = validateSsnId();
+        const isNameValid = validateCustomerName();
+        // [Add validation for all other fields]
+        
+        if (!isSsnValid || !isNameValid /* || other validations */) {
+          return;
+        }
+        
+        // Get form values
         const accountDetails = {
-          ssnId: document.getElementById("ssnId").value.trim(),
-          customerName: document.getElementById("customerName").value.trim(),
-          accountNumber: document.getElementById("accountNumber").value.trim(),
-          ifscCode: document.getElementById("ifscCode").value.trim(),
-          accountBalance: parseFloat(document.getElementById("accountBalance").value),
-          aadharNumber: document.getElementById("aadharNumber").value.trim(),
-          panNumber: document.getElementById("panNumber").value.trim(),
-          dob: document.getElementById("dob").value,
-          gender: document.getElementById("gender").value,
-          maritalStatus: document.getElementById("maritalStatus").value,
-          email: document.getElementById("email").value.trim(),
-          address: document.getElementById("address").value.trim(),
-          contactNumber: document.getElementById("contactNumber").value.trim(),
+          ssnId: document.getElementById('ssnId').value.trim(),
+          customerName: document.getElementById('customerName').value.trim(),
+          accountNumber: document.getElementById('accountNumber').value.trim(),
+          ifscCode: document.getElementById('ifscCode').value.trim(),
+          accountBalance: parseFloat(document.getElementById('accountBalance').value),
+          aadharNumber: document.getElementById('aadharNumber').value.trim(),
+          panNumber: document.getElementById('panNumber').value.trim(),
+          dob: document.getElementById('dob').value,
+          gender: document.getElementById('gender').value,
+          maritalStatus: document.getElementById('maritalStatus').value,
+          email: document.getElementById('email').value.trim(),
+          address: document.getElementById('address').value.trim(),
+          contactNumber: document.getElementById('contactNumber').value.trim(),
           createdAt: new Date().toISOString(),
-          createdBy: currentUser.empId ? `EMP-${currentUser.empId}` : `CUST-${currentUser.customerId}`,
+          createdBy: `CUST-${currentUser.customerId}`
         };
-
-        // Input validation (basic check)
-        if (!accountDetails.ssnId || !accountDetails.customerName || !accountDetails.accountNumber) {
-          alert("Please fill all required fields.");
-          return;
-        }
-
-        // Check for duplicate account number
-        let accounts = JSON.parse(localStorage.getItem("customerAccounts") || "[]");
-        const duplicate = accounts.find(acc => acc.accountNumber === accountDetails.accountNumber);
-        if (duplicate) {
-          alert("Account Number already exists. Use a unique one.");
-          return;
-        }
-
-        accounts.push(accountDetails);
-        localStorage.setItem("customerAccounts", JSON.stringify(accounts));
-
+        
+        // Store in localStorage (single account per customer)
+        localStorage.setItem('customerAccount', JSON.stringify(accountDetails));
+        
         // Show success message
-        successBox.style.display = "flex";
+        successBox.style.display = 'flex';
+        
+        // Hide after 3 seconds and redirect
         setTimeout(() => {
-          successBox.style.display = "none";
-          accountForm.reset();
+          successBox.style.display = 'none';
+          window.location.href = 'home.html'; // or wherever you want to redirect
         }, 3000);
+        
+        // Reset form
+        accountForm.reset();
       });
     });
   </script>

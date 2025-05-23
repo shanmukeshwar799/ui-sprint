@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>World Bank - Withdraw Amount</title>
+  <title>GVK Bank - Withdraw Amount</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <style>
     :root {
@@ -304,7 +304,7 @@
   <header>
     <div class="header-container">
       <div class="logo" onclick="location.href='index.html'">
-        <h1>World<span>Bank</span></h1>
+        <h1>GVK<span>Bank</span></h1>
       </div>
       <div class="user-info" id="userInfo">
         <i class="fas fa-user-circle"></i>
@@ -319,7 +319,14 @@
   </header>
   
   <main>
+    
     <div class="withdrawal-container">
+      <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+  <a href="javascript:history.back()" class="btn-back" title="Go Back">
+    <i class="fas fa-arrow-left"></i> Back
+  </a>
+  
+</div>
       <h2>Withdraw Amount</h2>
       
       <div class="balance-info">
@@ -348,12 +355,12 @@
   <footer>
     <div class="footer-container">
       <div class="footer-bottom">
-        <p>&copy; 2025 World Bank. All rights reserved. | Phone: (123) 456-7890</p>
+        <p>&copy; 2025 GVK Bank. All rights reserved. | Phone: (123) 456-7890</p>
       </div>
     </div>
   </footer>
 
-  <script>
+ <script>
     document.addEventListener("DOMContentLoaded", function() {
       // Check if user is logged in
       const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
@@ -379,28 +386,22 @@
         window.location.href = 'login.html';
       });
       
-      // Get customer accounts from localStorage
-      let accounts = JSON.parse(localStorage.getItem('customerAccounts') || '[]');
+      // Get customer account from localStorage (single account)
+      const customerAccount = JSON.parse(localStorage.getItem('customerAccount') || {});
       
-      // Find the account for the current customer
-      let currentAccount = accounts.find(acc => acc.customerId === currentUser.customerId);
-      
-      // If no account exists for this customer, create one with default balance
-      if (!currentAccount) {
-        currentAccount = {
-          accountNumber: 'ACC' + Math.floor(10000000 + Math.random() * 90000000).toString(),
-          customerId: currentUser.customerId,
-          accountType: 'Savings',
-          accountBalance: 10000.00, // Default balance
-          openedDate: new Date().toISOString().split('T')[0]
-        };
-        accounts.push(currentAccount);
-        localStorage.setItem('customerAccounts', JSON.stringify(accounts));
+      // If no account exists, create one with default balance
+      if (!customerAccount.accountNumber) {
+        customerAccount.accountNumber = 'ACC' + Math.floor(10000000 + Math.random() * 90000000).toString();
+        customerAccount.customerId = currentUser.customerId;
+        customerAccount.accountType = 'Savings';
+        customerAccount.accountBalance = 10000.00; // Default balance
+        customerAccount.openedDate = new Date().toISOString().split('T')[0];
+        localStorage.setItem('customerAccount', JSON.stringify(customerAccount));
       }
       
       // Display current balance
       const currentBalanceElement = document.getElementById('currentBalance');
-      currentBalanceElement.textContent = currentAccount.accountBalance.toFixed(2);
+      currentBalanceElement.textContent = customerAccount.accountBalance.toFixed(2);
       
       // Withdrawal form submission
       const withdrawalForm = document.getElementById('withdrawalForm');
@@ -417,11 +418,23 @@
         
         // Get withdrawal amount
         const withdrawalAmount = parseFloat(document.getElementById('withdrawalAmount').value);
-        const currentBalance = parseFloat(currentAccount.accountBalance);
+        const currentBalance = parseFloat(customerAccount.accountBalance);
         
         // Validate withdrawal
+        if (isNaN(withdrawalAmount) ){
+          errorMessage.textContent = "Please enter a valid amount";
+          errorMessage.style.display = 'block';
+          return;
+        }
+        
         if (withdrawalAmount < 1000) {
           errorMessage.textContent = "Minimum withdrawal amount is ₹1000";
+          errorMessage.style.display = 'block';
+          return;
+        }
+        
+        if (withdrawalAmount > currentBalance) {
+          errorMessage.textContent = "Insufficient funds for this withdrawal";
           errorMessage.style.display = 'block';
           return;
         }
@@ -437,14 +450,23 @@
         const newBalance = currentBalance - withdrawalAmount;
         
         // Update account balance
-        currentAccount.accountBalance = newBalance;
+        customerAccount.accountBalance = newBalance;
+        
+        // Add transaction record
+        const transaction = {
+          type: 'withdrawal',
+          amount: withdrawalAmount,
+          date: new Date().toISOString(),
+          balanceAfter: newBalance
+        };
+        
+        if (!customerAccount.transactions) {
+          customerAccount.transactions = [];
+        }
+        customerAccount.transactions.push(transaction);
         
         // Update in localStorage
-        const accountIndex = accounts.findIndex(acc => acc.accountNumber === currentAccount.accountNumber);
-        if (accountIndex !== -1) {
-          accounts[accountIndex] = currentAccount;
-          localStorage.setItem('customerAccounts', JSON.stringify(accounts));
-        }
+        localStorage.setItem('customerAccount', JSON.stringify(customerAccount));
         
         // Show success message
         newBalanceElement.textContent = newBalance.toFixed(2);

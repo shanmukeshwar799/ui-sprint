@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>World Bank - Deposit Amount</title>
+  <title>GVK Bank - Deposit Amount</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <style>
     :root {
@@ -329,7 +329,7 @@
   <header>
     <div class="header-container">
       <div class="logo" onclick="location.href='index.html'">
-        <h1>World<span>Bank</span></h1>
+        <h1>GVK<span>Bank</span></h1>
       </div>
       <div class="user-info" id="userInfo">
         <i class="fas fa-user-circle"></i>
@@ -346,6 +346,12 @@
   <main>
     <div class="deposit-container">
       <h2>Deposit Amount</h2>
+      <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+  <a href="javascript:history.back()" class="btn-back" title="Go Back">
+    <i class="fas fa-arrow-left"></i> Back
+  </a>
+ 
+</div>
       
       <div class="account-info">
         <p>Account Number: <span id="accountNumber"></span></p>
@@ -394,55 +400,59 @@
   <footer>
     <div class="footer-container">
       <div class="footer-bottom">
-        <p>&copy; 2025 World Bank. All rights reserved. | Phone: (123) 456-7890</p>
+        <p>&copy; 2025 GVK Bank. All rights reserved. | Phone: (123) 456-7890</p>
       </div>
     </div>
   </footer>
 
-  <script>
+ <script>
     document.addEventListener("DOMContentLoaded", function() {
       // Check if user is logged in
       const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-      const currentUser = JSON.parse(localStorage.getItem('loggedInCustomer') || JSON.parse(localStorage.getItem('currentCustomer') || '{}'));
+      const currentUser = JSON.parse(localStorage.getItem('loggedInCustomer') || '{}');
       
-      if (!isLoggedIn || !currentUser.firstName) {
+      if (!isLoggedIn || !currentUser.customerId) {
         window.location.href = 'login.html';
         return;
       }
       
       // Display user info in header
-      const userInfo = document.getElementById('userInfo');
       const userName = document.getElementById('userName');
       const userId = document.getElementById('userId');
       
       userName.textContent = `${currentUser.firstName} ${currentUser.lastName}`;
-      userId.textContent = currentUser.empId ? `EMP ID: ${currentUser.empId}` : `CUST ID: ${currentUser.customerId}`;
+      userId.textContent = `CUST ID: ${currentUser.customerId}`;
       
       // Logout functionality
       document.getElementById('logoutBtn').addEventListener('click', function(e) {
         e.preventDefault();
         localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('loggedInEmployee');
-        localStorage.removeItem('currentCustomer');
+        localStorage.removeItem('loggedInCustomer');
         window.location.href = 'login.html';
       });
       
-      // Get customer accounts from localStorage
-      let accounts = JSON.parse(localStorage.getItem('customerAccounts') || '[]');
-      
-      // For demo purposes, use the first account if available
-      let currentAccount = accounts.length > 0 ? accounts[0] : null;
+      // Get customer account from localStorage (single account)
+      const customerAccount = JSON.parse(localStorage.getItem('customerAccount') || {});
       
       // Display account info
       const accountNumberElement = document.getElementById('accountNumber');
       const currentBalanceElement = document.getElementById('currentBalance');
       
-      if (currentAccount) {
-        accountNumberElement.textContent = currentAccount.accountNumber;
-        currentBalanceElement.textContent = currentAccount.accountBalance.toFixed(2);
+      if (customerAccount.accountNumber) {
+        accountNumberElement.textContent = customerAccount.accountNumber;
+        currentBalanceElement.textContent = customerAccount.accountBalance.toFixed(2);
       } else {
-        accountNumberElement.textContent = "Not available";
-        currentBalanceElement.textContent = "0.00";
+        // Create account if doesn't exist
+        customerAccount.accountNumber = 'ACC' + Math.floor(10000000 + Math.random() * 90000000).toString();
+        customerAccount.customerId = currentUser.customerId;
+        customerAccount.customerName = `${currentUser.firstName} ${currentUser.lastName}`;
+        customerAccount.accountType = 'Savings';
+        customerAccount.accountBalance = 0.00;
+        customerAccount.openedDate = new Date().toISOString();
+        localStorage.setItem('customerAccount', JSON.stringify(customerAccount));
+        
+        accountNumberElement.textContent = customerAccount.accountNumber;
+        currentBalanceElement.textContent = '0.00';
       }
       
       // Deposit form submission
@@ -461,10 +471,10 @@
         
         // Get deposit amount
         const depositAmount = parseFloat(document.getElementById('depositAmount').value);
-        const currentBalance = currentAccount ? parseFloat(currentAccount.accountBalance) : 0;
+        const currentBalance = parseFloat(customerAccount.accountBalance || 0);
         
         // Validate deposit
-        if (isNaN(depositAmount)) {
+        if (isNaN(depositAmount) ){
           errorMessage.textContent = "Please enter a valid amount";
           errorMessage.style.display = 'block';
           return;
@@ -476,32 +486,33 @@
           return;
         }
         
+        if (depositAmount > 100000) { // Example limit
+          errorMessage.textContent = "Maximum deposit amount is ₹100,000 per transaction";
+          errorMessage.style.display = 'block';
+          return;
+        }
+        
         // Process deposit
         const newBalance = currentBalance + depositAmount;
         
         // Update account balance
-        if (currentAccount) {
-          currentAccount.accountBalance = newBalance;
-          
-          // Add transaction record
-          if (!currentAccount.transactions) {
-            currentAccount.transactions = [];
-          }
-          
-          currentAccount.transactions.push({
-            type: "deposit",
-            amount: depositAmount,
-            date: new Date().toISOString(),
-            balanceAfter: newBalance
-          });
-          
-          // Update in localStorage
-          const accountIndex = accounts.findIndex(acc => acc.accountNumber === currentAccount.accountNumber);
-          if (accountIndex !== -1) {
-            accounts[accountIndex] = currentAccount;
-            localStorage.setItem('customerAccounts', JSON.stringify(accounts));
-          }
+        customerAccount.accountBalance = newBalance;
+        
+        // Add transaction record
+        const transaction = {
+          type: 'deposit',
+          amount: depositAmount,
+          date: new Date().toISOString(),
+          balanceAfter: newBalance
+        };
+        
+        if (!customerAccount.transactions) {
+          customerAccount.transactions = [];
         }
+        customerAccount.transactions.push(transaction);
+        
+        // Update in localStorage
+        localStorage.setItem('customerAccount', JSON.stringify(customerAccount));
         
         // Show success message
         newBalanceElement.textContent = newBalance.toFixed(2);
@@ -511,22 +522,18 @@
         currentBalanceElement.textContent = newBalance.toFixed(2);
         
         // Show account details
-        if (currentAccount) {
-          document.getElementById('detailName').textContent = currentAccount.customerName;
-          document.getElementById('detailAccountNumber').textContent = currentAccount.accountNumber;
-          document.getElementById('detailBalance').textContent = `₹${newBalance.toFixed(2)}`;
-          
-          if (currentAccount.transactions && currentAccount.transactions.length > 0) {
-            const lastTransaction = currentAccount.transactions[currentAccount.transactions.length - 1];
-            const transactionDate = new Date(lastTransaction.date);
-            document.getElementById('detailTransaction').textContent = 
-              `₹${lastTransaction.amount.toFixed(2)} on ${transactionDate.toLocaleString()}`;
-          } else {
-            document.getElementById('detailTransaction').textContent = "No transactions yet";
-          }
-          
-          accountDetails.classList.remove('hidden');
+        document.getElementById('detailName').textContent = customerAccount.customerName;
+        document.getElementById('detailAccountNumber').textContent = customerAccount.accountNumber;
+        document.getElementById('detailBalance').textContent = `₹${newBalance.toFixed(2)}`;
+        
+        if (customerAccount.transactions && customerAccount.transactions.length > 0) {
+          const lastTransaction = customerAccount.transactions[customerAccount.transactions.length - 1];
+          const transactionDate = new Date(lastTransaction.date);
+          document.getElementById('detailTransaction').textContent = 
+            `₹${lastTransaction.amount.toFixed(2)} on ${transactionDate.toLocaleString()}`;
         }
+        
+        accountDetails.classList.remove('hidden');
         
         // Reset form
         depositForm.reset();

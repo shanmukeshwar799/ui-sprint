@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>World Bank - Customer Login</title>
+  <title>GVK Bank - Customer Login</title>
   <style>
     :root {
       --primary-color: #003366; /* Deep blue - bank primary color */
@@ -318,13 +318,13 @@
   <header>
     <div class="header-container">
       <div class="logo">
-        <h1 onclick="location.href='index.html'">World<span>Bank</span></h1>
+        <h1 onclick="location.href='index.html'">GVK<span>Bank</span></h1>
       </div>
       <nav>
         <ul>
           <li><a href="login.html">Login</a></li>
-          <li><a href="register.html">Register</a></li>
-          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="registation.html">Register</a></li>
+          
         </ul>
       </nav>
     </div>
@@ -336,7 +336,7 @@
       <form id="loginForm">
         <div class="form-group">
           <label for="ssnId">SSN ID</label>
-          <input type="text" id="ssnId" maxlength="9" required placeholder="Enter your SSN ID">
+          <input type="text" id="ssnId" maxlength="7" required placeholder="Enter your SSN ID">
           <div class="error" id="ssnIdError"></div>
         </div>
         
@@ -350,7 +350,7 @@
       </form>
       
       <div class="register-link">
-        Don't have an account? <a href="register.html">Register here</a>
+        Don't have an account? <a href="registation.html">Register here</a>
       </div>
     </div>
   </main>
@@ -364,7 +364,7 @@
   <footer>
     <div class="footer-container">
       <div class="footer-bottom">
-        <p>&copy; 2025 World Bank. All rights reserved. | Phone: (123) 456-7890</p>
+        <p>&copy; 2025 GVK Bank. All rights reserved. | Phone: (123) 456-7890</p>
       </div>
     </div>
   </footer>
@@ -389,17 +389,17 @@
 
       if (!isSsnIdValid || !isPasswordValid) return;
 
-      // Read all customers from localStorage
-      const customerData = localStorage.getItem('customers');
+      // Read single customer from localStorage
+      const customerData = localStorage.getItem('customer');
       if (!customerData) {
-        showError('passwordError', 'No customers registered.');
+        showError('passwordError', 'No user registered. Please register first.');
         return;
       }
 
-      const customers = JSON.parse(customerData);
-      const customer = customers.find(c => c.ssnId === ssnId);
+      const customer = JSON.parse(customerData);
 
-      if (!customer) {
+      // Check SSN ID (now 7 digits as per registration change)
+      if (customer.ssnId !== ssnId) {
         showError('ssnIdError', 'SSN ID not found.');
         return;
       }
@@ -419,15 +419,15 @@
       }, 2000);
     });
 
-    // Validation functions
+    // Validation functions - updated for 7-digit SSN
     function validateSsnId() {
       const ssnId = document.getElementById('ssnId').value.trim();
       if (!ssnId) {
         showError('ssnIdError', 'SSN ID is required');
         return false;
       }
-      if (!/^\d{9}$/.test(ssnId)) {
-        showError('ssnIdError', 'SSN ID must be 9 digits');
+      if (!/^\d{7}$/.test(ssnId)) {
+        showError('ssnIdError', 'SSN ID must be 7 digits');
         return false;
       }
       hideError('ssnIdError');

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>World Bank - Customer Registration</title>
+  <title>GVK Bank - Customer Registration</title>
   <style>
     :root {
       --primary-color: #003366;
@@ -340,13 +340,13 @@
   <header>
     <div class="header-container">
       <div class="logo">
-        <h1 onclick="location.href='index.html'">World<span>Bank</span></h1>
+        <h1 onclick="location.href='index.html'">GVK<span>Bank</span></h1>
       </div>
       <nav>
         <ul>
           <li><a href="login.html">Login</a></li>
-          <li><a href="register.html">Register</a></li>
-          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="registation.html">Register</a></li>
+         
         </ul>
       </nav>
     </div>
@@ -360,7 +360,7 @@
         <form id="registrationForm">
           <div class="form-group">
             <label for="ssnId">SSN ID</label>
-            <input type="text" id="ssnId" maxlength="9" required placeholder="Enter 9-digit SSN">
+            <input type="text" id="ssnId" maxlength="7" required placeholder="Enter 7-digit SSN">
             <div class="error" id="ssnIdError"></div>
           </div>
           
@@ -429,7 +429,7 @@
   <footer>
     <div class="footer-container">
       <div class="footer-bottom">
-        <p>&copy; 2025 World Bank. All rights reserved. | Phone: (123) 456-7890</p>
+        <p>&copy; 2025 GVK Bank. All rights reserved. | Phone: (123) 456-7890</p>
       </div>
     </div>
   </footer>
@@ -440,9 +440,9 @@ document.addEventListener("DOMContentLoaded", function() {
   const ackScreen = document.getElementById('acknowledgmentScreen');
   const formContainer = document.getElementById('registrationFormContainer');
 
-  // LocalStorage setup
-  if (!localStorage.getItem('customers')) {
-    localStorage.setItem('customers', JSON.stringify([]));
+  // LocalStorage setup - using 'customer' for single user (instead of 'customers')
+  if (!localStorage.getItem('customer')) {
+    localStorage.setItem('customer', JSON.stringify(null));
   }
 
   // Validation Functions
@@ -462,17 +462,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function validateSsnId() {
     const ssn = document.getElementById('ssnId').value.trim();
-    return /^\d{9}$/.test(ssn) ? clearError('ssnId') : showError('ssnId', 'Enter a valid 9-digit SSN');
+return /^[1-9]\d{6}$/.test(ssn) ? clearError('ssnId') : showError('ssnId', 'Enter a valid 7-digit SSN that does not start with 0');
   }
 
   function validateFirstName() {
     const name = document.getElementById('firstName').value.trim();
-    return name.length > 0 ? clearError('firstName') : showError('firstName', 'First name is required');
+    return /^[A-Za-z][A-Za-z\s\-]*$/.test(name) ? clearError('firstName') : showError('firstName', 'First name is required and do not enter numbers');
   }
 
   function validateLastName() {
     const name = document.getElementById('lastName').value.trim();
-    return name.length > 0 ? clearError('lastName') : showError('lastName', 'Last name is required');
+    return /^[A-Za-z][A-Za-z\s\-]*$/.test(name) ? clearError('lastName') : showError('lastName', 'Last name is required');
   }
 
   function validateEmail() {
@@ -499,7 +499,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
   function validateContactNumber() {
     const number = document.getElementById('contactNumber').value.trim();
-    return /^\d{10}$/.test(number) ? clearError('contactNumber') : showError('contactNumber', 'Enter a valid 10-digit number');
+    // 10 digits, not starting with 0
+    return /^[1-9]\d{9}$/.test(number) ? clearError('contactNumber') : showError('contactNumber', 'Enter a valid 10-digit number not starting with 0 do not enter letters');
   }
 
   // Attach real-time validation
@@ -538,19 +539,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (valid.includes(false)) return;
 
-    const customers = JSON.parse(localStorage.getItem('customers'));
+    const existingCustomer = JSON.parse(localStorage.getItem('customer'));
 
-    // Check duplicates
-    const ssnExists = customers.some(c => c.ssnId === ssnId);
-    const emailExists = customers.some(c => c.email === email);
+    // Check if user already exists
+    if (existingCustomer) {
+      return showError('ssnId', 'A user is already registered');
+    }
 
-    if (ssnExists) return showError('ssnId', 'SSN ID already registered');
-    if (emailExists) return showError('email', 'Email already registered');
+    // Generate customer ID - simplified since we only have one user
+    const customerId = 'CUST00001';
 
-    // Generate customer ID
-    const customerId = 'CUST' + (customers.length + 1).toString().padStart(5, '0');
-
-    // Save new customer
+    // Save new customer (only one)
     const newCustomer = {
       customerId,
       ssnId,
@@ -562,8 +561,7 @@ document.addEventListener("DOMContentLoaded", function() {
       contactNumber
     };
 
-    customers.push(newCustomer);
-    localStorage.setItem('customers', JSON.stringify(customers));
+    localStorage.setItem('customer', JSON.stringify(newCustomer));
 
     // Show acknowledgment
     document.getElementById('ackCustomerId').textContent = customerId;
